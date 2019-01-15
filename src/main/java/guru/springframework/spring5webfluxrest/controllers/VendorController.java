@@ -21,12 +21,12 @@ public class VendorController {
     }
 
     @GetMapping
-    Flux<Vendor> list(){
+    Flux<Vendor> list() {
         return vendorRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    Mono<Vendor> getById(@PathVariable String id){
+    Mono<Vendor> getById(@PathVariable String id) {
         return vendorRepository.findById(id);
     }
 
@@ -40,5 +40,24 @@ public class VendorController {
     Mono<Vendor> update(@PathVariable String id, @RequestBody Vendor vendor) {
         vendor.setId(id);
         return vendorRepository.save(vendor);
+    }
+
+    @PatchMapping("/{id}")
+    Mono<Vendor> patch(@PathVariable String id, @RequestBody Vendor vendor) {
+
+        Vendor foundVendor = vendorRepository.findById(id).block();
+        boolean modified = false;
+
+        if (vendor.getFirstName() != null &&
+                (foundVendor.getFirstName() == null || !foundVendor.getFirstName().equals(vendor.getFirstName()))) {
+            foundVendor.setFirstName(vendor.getFirstName());
+            modified = true;
+        }
+        if (vendor.getLastName() != null &&
+                (foundVendor.getLastName() == null || !foundVendor.getLastName().equals(vendor.getLastName()))) {
+            foundVendor.setLastName(vendor.getLastName());
+            modified = true;
+        }
+        return modified ? vendorRepository.save(foundVendor) : Mono.just(foundVendor);
     }
 }
