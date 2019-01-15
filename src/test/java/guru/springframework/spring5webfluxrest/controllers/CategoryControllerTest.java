@@ -11,7 +11,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 public class CategoryControllerTest {
 
@@ -59,7 +62,7 @@ public class CategoryControllerTest {
         Mono<Category> catToSaveMono = Mono.just(Category.builder().description("Some Cat").build());
 
         webTestClient.post()
-                .uri("/api/v1/categories")
+                .uri(CategoryController.BASE_URL)
                 .body(catToSaveMono, Category.class)
                 .exchange()
                 .expectStatus()
@@ -74,10 +77,50 @@ public class CategoryControllerTest {
         Mono<Category> catToUpdateMono = Mono.just(Category.builder().description("Some Cat").build());
 
         webTestClient.put()
-                .uri("/api/v1/categories/asdfasdf")
+                .uri(CategoryController.BASE_URL + "/asdfasdf")
                 .body(catToUpdateMono, Category.class)
                 .exchange()
                 .expectStatus()
                 .isOk();
+    }
+
+    @Test
+    public void testPatchWithChanges() {
+        given(categoryRepository.findById(anyString()))
+                .willReturn(Mono.just(Category.builder().build()));
+
+        given(categoryRepository.save(any(Category.class)))
+                .willReturn(Mono.just(Category.builder().build()));
+
+        Mono<Category> catToUpdateMono = Mono.just(Category.builder().description("New Description").build());
+
+        webTestClient.patch()
+                .uri(CategoryController.BASE_URL + "/asdfasdf")
+                .body(catToUpdateMono, Category.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        verify(categoryRepository).save(any());
+    }
+
+    @Test
+    public void testPatchNoChanges() {
+        given(categoryRepository.findById(anyString()))
+                .willReturn(Mono.just(Category.builder().build()));
+
+        given(categoryRepository.save(any(Category.class)))
+                .willReturn(Mono.just(Category.builder().build()));
+
+        Mono<Category> catToUpdateMono = Mono.just(Category.builder().build());
+
+        webTestClient.patch()
+                .uri(CategoryController.BASE_URL + "/asdfasdf")
+                .body(catToUpdateMono, Category.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        verify(categoryRepository, never()).save(any());
     }
 }
