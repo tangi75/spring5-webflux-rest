@@ -4,7 +4,9 @@ import guru.springframework.spring5webfluxrest.domain.Vendor;
 import guru.springframework.spring5webfluxrest.repositories.VendorRepository;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,7 +23,6 @@ public class VendorControllerTest {
     @InjectMocks
     VendorController vendorController;
 
-    private final String BASE_URL = "/api/v1/vendors";
     private final Vendor VENDOR_1 = Vendor.builder().firstName("Fred").firstName("Flintstone").build();
     private final Vendor VENDOR_2 = Vendor.builder().firstName("Barney").firstName("Rubble").build();
 
@@ -37,7 +38,7 @@ public class VendorControllerTest {
                 .willReturn(Flux.just(VENDOR_1,VENDOR_2));
 
         webTestClient.get()
-                .uri(BASE_URL)
+                .uri(VendorController.BASE_URL)
                 .exchange()
                 .expectBodyList(Vendor.class)
                 .hasSize(2);
@@ -49,7 +50,7 @@ public class VendorControllerTest {
                 .willReturn(Mono.just(VENDOR_1));
 
         webTestClient.get()
-                .uri(BASE_URL + "/someid")
+                .uri(VendorController.BASE_URL + "/someid")
                 .exchange()
                 .expectBody(Vendor.class);
     }

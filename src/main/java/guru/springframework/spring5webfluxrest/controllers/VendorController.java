@@ -10,8 +10,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/v1/vendors")
+@RequestMapping(VendorController.BASE_URL)
 public class VendorController {
+
+    static final String BASE_URL = "/api/v1/vendors";
 
     private final VendorRepository vendorRepository;
 

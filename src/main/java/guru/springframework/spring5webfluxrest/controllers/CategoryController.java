@@ -12,7 +12,10 @@ import reactor.core.publisher.Mono;
  * Created by jt on 12/24/17.
  */
 @RestController
+@RequestMapping(CategoryController.BASE_URL)
 public class CategoryController {
+
+    static final String BASE_URL = "/api/v1/categories";
 
     private final CategoryRepository categoryRepository;
 
@@ -20,12 +23,12 @@ public class CategoryController {
         this.categoryRepository = categoryRepository;
     }
 
-    @GetMapping("/api/v1/categories")
+    @GetMapping
     Flux<Category> list(){
         return categoryRepository.findAll();
     }
 
-    @GetMapping("/api/v1/categories/{id}")
+    @GetMapping("/{id}")
     Mono<Category> getById(@PathVariable String id){
         return categoryRepository.findById(id);
     }
